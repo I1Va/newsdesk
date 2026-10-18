@@ -4,6 +4,7 @@
     "half_life_hours": 6,
     "listen": "0.0.0.0:7000",
     "journal_path": "newsdesk.wal",
+    "outbox_max_size": 1000,
     "clients": [
         {"id": "alice", "trust": 0.5, "role": "reporter"},
         {"id": "bob", "trust": 0.3, "role": "reporter"},

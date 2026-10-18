@@ -43,6 +43,7 @@ int RunServer(int argc, char** argv) {
     config.congratulated_k = config_json.value("congratulated_k", 3);
     config.half_life = std::chrono::hours(config_json.value("half_life_hours", 6));
     config.journal_path = config_json.value("journal_path", "newsdesk.wal");
+    config.outbox_max_size = config_json.value("outbox_max_size", 1000);
     SplitHostPort(config_json.value("listen", "0.0.0.0:7000"), &config.bind_address, &config.port);
 
     for (const auto& entry : config_json.value("clients", nlohmann::json::array())) {
@@ -57,6 +58,27 @@ int RunServer(int argc, char** argv) {
     std::string listen_override = GetArg(argc, argv, "--listen", "");
     if (!listen_override.empty()) {
         SplitHostPort(listen_override, &config.bind_address, &config.port);
+    }
+
+    std::string threshold_override = GetArg(argc, argv, "--threshold", "");
+    if (!threshold_override.empty()) {
+        config.threshold = std::stod(threshold_override);
+    }
+    std::string k_override = GetArg(argc, argv, "--congratulated-k", "");
+    if (!k_override.empty()) {
+        config.congratulated_k = std::stoi(k_override);
+    }
+    std::string half_life_override = GetArg(argc, argv, "--half-life-hours", "");
+    if (!half_life_override.empty()) {
+        config.half_life = std::chrono::hours(std::stoi(half_life_override));
+    }
+    std::string journal_override = GetArg(argc, argv, "--journal-path", "");
+    if (!journal_override.empty()) {
+        config.journal_path = journal_override;
+    }
+    std::string outbox_override = GetArg(argc, argv, "--outbox-max-size", "");
+    if (!outbox_override.empty()) {
+        config.outbox_max_size = std::stoul(outbox_override);
     }
 
     auto platform = newsdesk::platform::CreatePlatform();

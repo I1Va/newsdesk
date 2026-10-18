@@ -240,6 +240,18 @@ void Server::HandleNote(Connection& connection, const protocol::NoteMessage& not
         if (outbox_it == outboxes_.end()) {
             continue;
         }
+
+        if (outbox_it->second.IsFull()) {
+            auto conn_it = connected_clients_.find(congrats.client_id);
+            if (conn_it != connected_clients_.end()) {
+                auto connection_it = connections_.find(conn_it->second);
+                if (connection_it != connections_.end()) {
+                    CloseConnection(connection_it->second);
+                }
+            }
+            continue;
+        }
+
         uint64_t seq = outbox_it->second.NextSeq();
         protocol::CongratsPayload payload{seq, congrats.story, congrats.rank, congrats.text};
         std::string line = protocol::Serialize(payload);

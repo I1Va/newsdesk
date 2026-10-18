@@ -17,13 +17,22 @@ def free_port():
     return port
 
 
-def write_config(path, journal_path, threshold=0.75, k=3, half_life_hours=6, clients=None):
+def write_config(
+    path,
+    journal_path,
+    threshold=0.75,
+    k=3,
+    half_life_hours=6,
+    clients=None,
+    outbox_max_size=1000,
+):
     config = {
         "threshold": threshold,
         "congratulated_k": k,
         "half_life_hours": half_life_hours,
         "listen": "127.0.0.1:0",
         "journal_path": journal_path,
+        "outbox_max_size": outbox_max_size,
         "clients": clients or [],
     }
     with open(path, "w") as f:
@@ -113,6 +122,19 @@ class Connection:
 
     def bye(self):
         self.send({"type": "bye"})
+
+    def no_more_messages(self, timeout=0.3):
+        if self.buffer:
+            return False
+        self.sock.settimeout(timeout)
+        try:
+            chunk = self.sock.recv(4096)
+        except socket.timeout:
+            return True
+        if not chunk:
+            return True
+        self.buffer += chunk
+        return False
 
     def close(self):
         self.sock.close()

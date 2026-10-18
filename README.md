@@ -46,9 +46,18 @@ cd build
 ctest --output-on-failure
 ```
 
+## Сквозные сценарии (Python, pytest)
+
+Запускают собранный `newsdesk` целиком как подпроцесс и общаются с ним по сокету.
+Требуют сборки проекта (см. выше) и `pytest`.
+
+```sh
+python3 -m pytest scripts/e2e -v
+```
+
 ## Запуск
 
 ```sh
 ./build/src/newsdesk server --config config/example.json
-./build/src/newsdesk client --config config/example.json
+./build/src/newsdesk client --server 127.0.0.1 --port 7000 --client-id alice
 ```
