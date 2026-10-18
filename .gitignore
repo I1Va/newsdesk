@@ -1,0 +1,7 @@
+build/
+*.wal
+*.o
+*.a
+*.out
+compile_commands.json
+.cache/
