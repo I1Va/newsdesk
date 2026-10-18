@@ -54,6 +54,12 @@ struct ParsedMessage {
 
 std::optional<ParsedMessage> ParseIncoming(const std::string& line);
 
+std::string Serialize(const HelloMessage& message);
+std::string Serialize(const NoteMessage& message);
+std::string Serialize(const AckMessage& message);
+std::string Serialize(const StatsRequestMessage& message);
+std::string Serialize(const ByeMessage& message);
+
 // server -> client.
 struct WelcomeMessage {
     std::string client_id;

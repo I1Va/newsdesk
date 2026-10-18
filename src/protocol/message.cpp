@@ -6,6 +6,10 @@ namespace newsdesk::protocol {
 
 namespace {
 
+int64_t ToMillis(TimePoint time) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
+}
+
 TimePoint FromMillis(int64_t millis) {
     return TimePoint{} + std::chrono::milliseconds(millis);
 }
@@ -88,6 +92,46 @@ std::optional<ParsedMessage> ParseIncoming(const std::string& line) {
     }
 
     return std::nullopt;
+}
+
+std::string Serialize(const HelloMessage& message) {
+    nlohmann::json j;
+    j["type"] = "hello";
+    j["client_id"] = message.client_id;
+    j["last_seq"] = message.last_seq;
+    return j.dump();
+}
+
+std::string Serialize(const NoteMessage& message) {
+    nlohmann::json j;
+    j["type"] = "note";
+    j["note_id"] = message.note_id;
+    j["rubric"] = message.rubric;
+    j["topic"] = message.topic;
+    j["event_time"] = ToMillis(message.event_time);
+    return j.dump();
+}
+
+std::string Serialize(const AckMessage& message) {
+    nlohmann::json j;
+    j["type"] = "ack";
+    j["seq"] = message.seq;
+    return j.dump();
+}
+
+std::string Serialize(const StatsRequestMessage& message) {
+    nlohmann::json j;
+    j["type"] = "stats";
+    if (message.target_client_id.has_value()) {
+        j["client_id"] = *message.target_client_id;
+    }
+    return j.dump();
+}
+
+std::string Serialize(const ByeMessage&) {
+    nlohmann::json j;
+    j["type"] = "bye";
+    return j.dump();
 }
 
 std::string Serialize(const WelcomeMessage& message) {
