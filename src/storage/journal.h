@@ -32,7 +32,7 @@ struct NoteRecord {
 struct PublishRecord {
     StoryKey story;
     TimePoint published_at;
-    std::vector<Submitter> submitters; 
+    std::vector<Submitter> submitters;
 };
 
 struct EnqueueRecord {
@@ -60,8 +60,8 @@ std::string EncodeRecord(const JournalRecord& record);
 
 enum class DecodeStatus {
     kOk,
-    kCorrupt,    // при несовпадении checksum или при ошибки парсинга JSON
-    kTruncated,  
+    kCorrupt,  // при несовпадении checksum или при ошибки парсинга JSON
+    kTruncated,
 };
 
 struct DecodeResult {

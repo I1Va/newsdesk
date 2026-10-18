@@ -39,7 +39,7 @@ public:
     const StoryKey& Key() const;
     bool HasContributionFrom(const std::string& client_id) const;
     void AddContribution(const std::string& client_id, double weight, TimePoint anchor_time,
-                          TimePoint received_time);
+                         TimePoint received_time);
     double CurrentTrust(TimePoint now, Duration half_life) const;
 
     bool IsPublished() const;

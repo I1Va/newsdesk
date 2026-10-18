@@ -25,6 +25,20 @@ cmake --build build -j
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 ```
 
+## Codestyle (clang-format)
+
+Проверить, что форматирование не разошлось со стилем (ничего не меняет):
+
+```sh
+find src tests -name '*.h' -o -name '*.cpp' | xargs clang-format --dry-run --Werror
+```
+
+Исправить форматирование на месте:
+
+```sh
+find src tests -name '*.h' -o -name '*.cpp' | xargs clang-format -i
+```
+
 ## Тесты
 
 ```sh
