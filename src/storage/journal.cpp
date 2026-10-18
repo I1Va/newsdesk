@@ -210,13 +210,16 @@ Journal::Journal(platform::Platform& platform, std::string path)
     : platform_(platform), path_(std::move(path)), file_(platform_.OpenAppend(path_)) {}
 
 void Journal::Append(const JournalRecord& record) {
-    std::string line = EncodeRecord(record) + "\n";
+    JournalRecord numbered = record;
+    numbered.record_seq = next_record_seq_;
+
+    std::string line = EncodeRecord(numbered) + "\n";
     platform_.Append(file_, line.data(), line.size());
     platform_.Sync(file_);
-    next_record_seq_ = record.record_seq + 1;
+    next_record_seq_ += 1;
 }
 
-ReplayResult Journal::ReplayAll() const {
+ReplayResult Journal::ReplayAll() {
     ReplayResult result;
     std::string content = platform_.ReadAll(path_);
 
@@ -234,6 +237,7 @@ ReplayResult Journal::ReplayAll() const {
         DecodeResult decoded = DecodeRecord(line);
         if (decoded.status == DecodeStatus::kOk) {
             result.records.push_back(decoded.record);
+            next_record_seq_ = decoded.record.record_seq + 1;
             continue;
         }
 

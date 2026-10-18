@@ -85,7 +85,7 @@ public:
     void Append(const JournalRecord& record);
 
     // загружает журнал из диска в оперативку.
-    ReplayResult ReplayAll() const;
+    ReplayResult ReplayAll();
 
 private:
     platform::Platform& platform_;
