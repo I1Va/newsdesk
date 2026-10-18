@@ -18,6 +18,7 @@ public:
     explicit Outbox(size_t max_size);
 
     uint64_t Enqueue(std::string payload);
+    uint64_t NextSeq() const;
 
     void Ack(uint64_t seq);
 

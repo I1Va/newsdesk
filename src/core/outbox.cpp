@@ -10,6 +10,8 @@ uint64_t Outbox::Enqueue(std::string payload) {
     return seq;
 }
 
+uint64_t Outbox::NextSeq() const { return next_seq_; }
+
 void Outbox::Ack(uint64_t seq) {
     while (!entries_.empty() && entries_.front().seq <= seq) {
         entries_.pop_front();
