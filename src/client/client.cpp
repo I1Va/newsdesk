@@ -135,6 +135,8 @@ void Client::Run() {
         platform_.CloseSocket(socket_);
         return;
     }
+
+    platform_.SetPollInterest(socket_, platform::PollInterest::kRead);
     platform_.SetPollInterest(kStdin, platform::PollInterest::kRead);
 
     SendLine(protocol::Serialize(protocol::HelloMessage{config_.client_id, last_seq_}));

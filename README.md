@@ -14,7 +14,7 @@
 - `src/storage/` - формат журнала (WAL), кодирование/декодирование, проигрывание при старте.
 - `src/platform/` - всё, что зависит от ОС: сокеты, `poll`, сигналы, файлы (сейчас только POSIX/Linux; Windows - задел на будущее).
 - `src/server/`, `src/client/` - режимы `newsdesk server` / `newsdesk client`.
-- `tests/` - unit-тесты (doctest), `scripts/e2e/` - сквозные сценарии (pytest).
+- `tests/` - unit-тесты (doctest), `scripts/e2e/` - e2e сценарии (pytest).
 
 ## Требования
 - Linux, компилятор с поддержкой C++17 (gcc/clang)
