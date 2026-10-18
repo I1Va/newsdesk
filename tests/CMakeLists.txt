@@ -6,6 +6,7 @@ add_executable(newsdesk_tests
     test_outbox.cpp
     test_stats.cpp
     test_engine.cpp
+    test_protocol.cpp
 )
 target_link_libraries(newsdesk_tests PRIVATE newsdesk_core doctest::doctest)
 
