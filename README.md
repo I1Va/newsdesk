@@ -1,5 +1,9 @@
 # newsdesk
 
+# ФИО: Абрютин Иван Дмитриевич
+# Номер решаемой задачи: задание N6 "Издание" (системное программирование).
+# Описание принятых проектных решений лежит в спецификации проекта `docs/specification.md` 
+
 Сервер и клиент для сбора донесений от источников с разным доверием. Сервер объединяет донесения в сюжеты и решает, когда сюжет пора печатать. Подробности - в [`docs/specification.md`](docs/specification.md).
 
 ## Требования
@@ -14,11 +18,11 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j
 ```
 
-## compile_commands.json
+## clangd 
+Сгенерировать `compile_commands.json`:
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-ln -sf build/compile_commands.json compile_commands.json # символическая линка на всякий случай
 ```
 
 ## Тесты
