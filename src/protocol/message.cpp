@@ -26,6 +26,16 @@ std::string ReceiptStatusToString(ReceiptStatus status) {
     return "rejected";
 }
 
+Role RoleFromString(const std::string& role) {
+    return role == "editor" ? Role::kEditor : Role::kReporter;
+}
+
+ReceiptStatus ReceiptStatusFromString(const std::string& status) {
+    if (status == "accepted") return ReceiptStatus::kAccepted;
+    if (status == "duplicate") return ReceiptStatus::kDuplicate;
+    return ReceiptStatus::kRejected;
+}
+
 }  // namespace
 
 std::optional<ParsedMessage> ParseIncoming(const std::string& line) {
@@ -186,6 +196,85 @@ std::string Serialize(const StatsResponseMessage& message) {
     }
     j["stats"] = entries;
     return j.dump();
+}
+
+std::optional<ParsedServerMessage> ParseServerMessage(const std::string& line) {
+    nlohmann::json j;
+    try {
+        j = nlohmann::json::parse(line);
+    } catch (const nlohmann::json::exception&) {
+        return std::nullopt;
+    }
+
+    if (!j.is_object() || !j.contains("type") || !j["type"].is_string()) {
+        return std::nullopt;
+    }
+    std::string type = j["type"].get<std::string>();
+
+    try {
+        if (type == "welcome") {
+            ParsedServerMessage message;
+            message.type = OutgoingType::kWelcome;
+            WelcomeMessage welcome;
+            welcome.client_id = j.at("client_id").get<std::string>();
+            welcome.role = RoleFromString(j.at("role").get<std::string>());
+            message.welcome = welcome;
+            return message;
+        }
+        if (type == "error") {
+            ParsedServerMessage message;
+            message.type = OutgoingType::kError;
+            ErrorMessage error;
+            error.code = j.at("code").get<std::string>();
+            error.message = j.at("message").get<std::string>();
+            message.error = error;
+            return message;
+        }
+        if (type == "receipt") {
+            ParsedServerMessage message;
+            message.type = OutgoingType::kReceipt;
+            Receipt receipt;
+            receipt.note_id = j.at("note_id").get<std::string>();
+            receipt.status = ReceiptStatusFromString(j.at("status").get<std::string>());
+            receipt.reason = j.value("reason", "");
+            message.receipt = receipt;
+            return message;
+        }
+        if (type == "congrats") {
+            ParsedServerMessage message;
+            message.type = OutgoingType::kCongrats;
+            CongratsPayload congrats;
+            congrats.seq = j.at("seq").get<uint64_t>();
+            congrats.story.rubric = j.at("story").at("rubric").get<std::string>();
+            congrats.story.topic = j.at("story").at("topic").get<std::string>();
+            congrats.rank = j.at("rank").get<int>();
+            congrats.text = j.at("text").get<std::string>();
+            message.congrats = congrats;
+            return message;
+        }
+        if (type == "stats") {
+            ParsedServerMessage message;
+            message.type = OutgoingType::kStatsResponse;
+            StatsResponseMessage response;
+            for (const auto& entry : j.at("stats")) {
+                ClientStats stats;
+                stats.client_id = entry.at("client_id").get<std::string>();
+                stats.accepted = entry.at("accepted").get<uint64_t>();
+                stats.published = entry.at("published").get<uint64_t>();
+                stats.share = entry.at("share").get<double>();
+                stats.stories = entry.at("stories").get<uint64_t>();
+                stats.scoops = entry.at("scoops").get<uint64_t>();
+                stats.avg_rank = entry.at("avg_rank").get<double>();
+                response.stats.push_back(stats);
+            }
+            message.stats_response = response;
+            return message;
+        }
+    } catch (const nlohmann::json::exception&) {
+        return std::nullopt;
+    }
+
+    return std::nullopt;
 }
 
 }  // namespace newsdesk::protocol

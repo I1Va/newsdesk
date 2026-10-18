@@ -57,9 +57,9 @@ void Client::PumpIncoming() {
         pos = newline + 1;
         std::cout << line << "\n";
 
-        auto seq_pos = line.find("\"seq\":");
-        if (seq_pos != std::string::npos) {
-            uint64_t seq = std::stoull(line.substr(seq_pos + 6));
+        std::optional<protocol::ParsedServerMessage> parsed = protocol::ParseServerMessage(line);
+        if (parsed.has_value() && parsed->type == protocol::OutgoingType::kCongrats) {
+            uint64_t seq = parsed->congrats->seq;
             last_seq_ = seq;
             SendLine(protocol::Serialize(protocol::AckMessage{seq}));
         }

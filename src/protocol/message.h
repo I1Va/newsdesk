@@ -89,4 +89,23 @@ std::string Serialize(const Receipt& message);
 std::string Serialize(const CongratsPayload& message);
 std::string Serialize(const StatsResponseMessage& message);
 
+enum class OutgoingType {
+    kWelcome,
+    kError,
+    kReceipt,
+    kCongrats,
+    kStatsResponse,
+};
+
+struct ParsedServerMessage {
+    OutgoingType type;
+    std::optional<WelcomeMessage> welcome;
+    std::optional<ErrorMessage> error;
+    std::optional<Receipt> receipt;
+    std::optional<CongratsPayload> congrats;
+    std::optional<StatsResponseMessage> stats_response;
+};
+
+std::optional<ParsedServerMessage> ParseServerMessage(const std::string& line);
+
 }  // namespace newsdesk::protocol
