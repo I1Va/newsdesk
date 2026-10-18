@@ -44,7 +44,7 @@ struct EngineConfig {
 
 class Engine {
 public:
-    Engine(Registry& registry, Clock& clock, EngineConfig config);
+    Engine(Registry& registry, EngineConfig config);
 
     NoteOutcome HandleNote(const std::string& client_id, const std::string& note_id,
                            const std::string& rubric, const std::string& topic,
@@ -55,7 +55,6 @@ public:
 
 private:
     Registry& registry_;
-    Clock& clock_;
     EngineConfig config_;
 
     std::unordered_map<StoryKey, Story, StoryKeyHash> stories_;

@@ -1,5 +1,6 @@
 # newsdesk_core: платформо-независимая логика (core + protocol + формат storage).
 add_library(newsdesk_core STATIC
+    core/clock.cpp
     core/story.cpp
     core/trust.cpp
     core/registry.cpp
