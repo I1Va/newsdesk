@@ -10,9 +10,7 @@ int64_t ToMillis(TimePoint time) {
     return std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
 }
 
-TimePoint FromMillis(int64_t millis) {
-    return TimePoint{} + std::chrono::milliseconds(millis);
-}
+TimePoint FromMillis(int64_t millis) { return TimePoint{} + std::chrono::milliseconds(millis); }
 
 std::string RoleToString(Role role) { return role == Role::kEditor ? "editor" : "reporter"; }
 

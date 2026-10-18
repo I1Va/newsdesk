@@ -30,8 +30,8 @@ ClientStats StatsTracker::Get(const std::string& client_id) const {
     result.accepted = entry.accepted;
     result.published = entry.published;
     result.share = entry.accepted == 0
-                        ? 0.0
-                        : static_cast<double>(entry.published) / static_cast<double>(entry.accepted);
+                       ? 0.0
+                       : static_cast<double>(entry.published) / static_cast<double>(entry.accepted);
     result.stories = entry.stories.size();
     result.scoops = entry.scoops;
 

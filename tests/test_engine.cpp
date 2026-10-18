@@ -112,8 +112,7 @@ TEST_CASE("A note's weight decays from its event_time, not from received_time") 
     registry.Add(ClientInfo{"c1", 1.0, Role::kReporter});
     Engine engine(registry, EngineConfig{0.4, 1, 6h});
 
-    NoteOutcome outcome =
-        engine.HandleNote("c1", "n1", "local", "fire", kBase - 12h, kBase);
+    NoteOutcome outcome = engine.HandleNote("c1", "n1", "local", "fire", kBase - 12h, kBase);
 
     CHECK(outcome.receipt.status == ReceiptStatus::kAccepted);
     CHECK_FALSE(outcome.story_published);
@@ -126,8 +125,7 @@ TEST_CASE("An event_time in the future is clamped to received_time") {
     Engine engine(registry, EngineConfig{0.5, 1, 6h});
 
     engine.HandleNote("c1", "n1", "local", "fire", kBase + 100h, kBase);
-    NoteOutcome second =
-        engine.HandleNote("c2", "n2", "local", "fire", kBase + 50h, kBase + 50h);
+    NoteOutcome second = engine.HandleNote("c2", "n2", "local", "fire", kBase + 50h, kBase + 50h);
 
     CHECK_FALSE(second.story_published);
 }

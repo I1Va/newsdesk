@@ -2,12 +2,11 @@
 
 namespace newsdesk {
 
-Engine::Engine(Registry& registry, EngineConfig config)
-    : registry_(registry), config_(config) {}
+Engine::Engine(Registry& registry, EngineConfig config) : registry_(registry), config_(config) {}
 
 NoteOutcome Engine::HandleNote(const std::string& client_id, const std::string& note_id,
-                                const std::string& rubric, const std::string& topic,
-                                TimePoint event_time, TimePoint received_time) {
+                               const std::string& rubric, const std::string& topic,
+                               TimePoint event_time, TimePoint received_time) {
     NoteOutcome outcome;
 
     // Проверяем на повтор
@@ -16,8 +15,8 @@ NoteOutcome Engine::HandleNote(const std::string& client_id, const std::string& 
     if (found != client_notes.end()) {
         const Receipt& stored = found->second;
         outcome.receipt = stored.status == ReceiptStatus::kRejected
-                               ? stored
-                               : Receipt{note_id, ReceiptStatus::kDuplicate, ""};
+                              ? stored
+                              : Receipt{note_id, ReceiptStatus::kDuplicate, ""};
         return outcome;
     }
 
@@ -64,7 +63,7 @@ NoteOutcome Engine::HandleNote(const std::string& client_id, const std::string& 
                     congrats.story = key;
                     congrats.rank = rank;
                     congrats.text = "Поздравляем, ваша заметка попала в печать. Вы были " +
-                                     std::to_string(rank) + "-м, кто сказал нам об этой новости.";
+                                    std::to_string(rank) + "-м, кто сказал нам об этой новости.";
                     outcome.congrats.push_back(std::move(congrats));
                 }
             }

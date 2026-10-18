@@ -83,10 +83,9 @@ void Client::HandleStdinCommand(const std::string& command) {
         std::string rubric = rest.substr(1, sep - 1);
         std::string topic = rest.substr(sep + 1);
         protocol::NoteMessage note;
-        note.note_id = std::to_string(
-            std::chrono::duration_cast<std::chrono::nanoseconds>(
-                std::chrono::system_clock::now().time_since_epoch())
-                .count());
+        note.note_id = std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                          std::chrono::system_clock::now().time_since_epoch())
+                                          .count());
         note.rubric = rubric;
         note.topic = topic;
         note.event_time = std::chrono::system_clock::now();

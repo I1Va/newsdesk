@@ -65,7 +65,7 @@ bool Story::HasContributionFrom(const std::string& client_id) const {
 }
 
 void Story::AddContribution(const std::string& client_id, double weight, TimePoint anchor_time,
-                             TimePoint received_time) {
+                            TimePoint received_time) {
     contributions_.push_back(Contribution{client_id, weight, anchor_time});
     submitters_.push_back(Submitter{client_id, received_time});
 }

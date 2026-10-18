@@ -1,5 +1,3 @@
-#include "platform/platform.h"
-
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -14,6 +12,8 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+
+#include "platform/platform.h"
 
 namespace newsdesk::platform {
 
@@ -33,7 +33,7 @@ void SetNonBlocking(int fd) {
 class PosixPlatform : public Platform {
 public:
     PosixPlatform() {
-        struct sigaction action {};
+        struct sigaction action{};
         action.sa_handler = HandleShutdownSignal;
         sigaction(SIGINT, &action, nullptr);
         sigaction(SIGTERM, &action, nullptr);

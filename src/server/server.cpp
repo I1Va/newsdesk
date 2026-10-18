@@ -37,7 +37,7 @@ void Server::ReplayJournal() {
         if (record.type == storage::RecordType::kNote) {
             const storage::NoteRecord& note = *record.note;
             engine_.HandleNote(note.client_id, note.note_id, note.rubric, note.topic,
-                                note.event_time, note.received_time);
+                               note.event_time, note.received_time);
         } else if (record.type == storage::RecordType::kEnqueue) {
             const storage::EnqueueRecord& enqueue = *record.enqueue;
             auto it = outboxes_.find(enqueue.client_id);
@@ -141,7 +141,7 @@ void Server::HandleWritable(Connection& connection) {
         return;
     }
     platform::IoResult result = platform_.Write(connection.socket, connection.write_buffer.data(),
-                                                  connection.write_buffer.size());
+                                                connection.write_buffer.size());
     if (result.status == platform::IoStatus::kOk) {
         connection.write_buffer.erase(0, result.bytes);
     } else if (result.status == platform::IoStatus::kError ||
@@ -155,7 +155,8 @@ void Server::HandleWritable(Connection& connection) {
 void Server::ProcessLine(Connection& connection, const std::string& line) {
     std::optional<protocol::ParsedMessage> parsed = protocol::ParseIncoming(line);
     if (!parsed.has_value()) {
-        SendDirect(connection, protocol::Serialize(protocol::ErrorMessage{"bad_format", "malformed message"}));
+        SendDirect(connection,
+                   protocol::Serialize(protocol::ErrorMessage{"bad_format", "malformed message"}));
         return;
     }
 
@@ -173,8 +174,8 @@ void Server::ProcessLine(Connection& connection, const std::string& line) {
             Receipt receipt{parsed->note->note_id, ReceiptStatus::kRejected, "not_authenticated"};
             SendDirect(connection, protocol::Serialize(receipt));
         } else {
-            SendDirect(connection,
-                       protocol::Serialize(protocol::ErrorMessage{"not_authenticated", "handshake required"}));
+            SendDirect(connection, protocol::Serialize(protocol::ErrorMessage{
+                                       "not_authenticated", "handshake required"}));
         }
         return;
     }
@@ -191,7 +192,8 @@ void Server::ProcessLine(Connection& connection, const std::string& line) {
 void Server::HandleHello(Connection& connection, const protocol::HelloMessage& hello) {
     const ClientInfo* client = registry_.Find(hello.client_id);
     if (client == nullptr) {
-        SendDirect(connection, protocol::Serialize(protocol::ErrorMessage{"unknown_client", "no such client"}));
+        SendDirect(connection,
+                   protocol::Serialize(protocol::ErrorMessage{"unknown_client", "no such client"}));
         CloseConnection(connection);
         return;
     }
@@ -214,7 +216,7 @@ void Server::HandleHello(Connection& connection, const protocol::HelloMessage& h
 void Server::HandleNote(Connection& connection, const protocol::NoteMessage& note) {
     TimePoint received_time = clock_.Now();
     NoteOutcome outcome = engine_.HandleNote(connection.client_id, note.note_id, note.rubric,
-                                              note.topic, note.event_time, received_time);
+                                             note.topic, note.event_time, received_time);
 
     storage::NoteRecord note_record;
     note_record.client_id = connection.client_id;
@@ -278,7 +280,8 @@ void Server::HandleAck(Connection& connection, const protocol::AckMessage& ack) 
 void Server::HandleStats(Connection& connection, const protocol::StatsRequestMessage& request) {
     if (request.target_client_id.has_value() && *request.target_client_id != connection.client_id) {
         if (connection.role != Role::kEditor) {
-            SendDirect(connection, protocol::Serialize(protocol::ErrorMessage{"forbidden", "editor only"}));
+            SendDirect(connection,
+                       protocol::Serialize(protocol::ErrorMessage{"forbidden", "editor only"}));
             return;
         }
         protocol::StatsResponseMessage response;
@@ -309,8 +312,9 @@ void Server::SendDirect(Connection& connection, std::string line) {
 }
 
 void Server::UpdatePollInterest(Connection& connection) {
-    platform::PollInterest interest =
-        connection.write_buffer.empty() ? platform::PollInterest::kRead : platform::PollInterest::kReadWrite;
+    platform::PollInterest interest = connection.write_buffer.empty()
+                                          ? platform::PollInterest::kRead
+                                          : platform::PollInterest::kReadWrite;
     platform_.SetPollInterest(connection.socket, interest);
 }
 

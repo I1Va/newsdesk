@@ -64,7 +64,7 @@ int RunServer(int argc, char** argv) {
     newsdesk::server::Server server(*platform, clock, config);
 
     std::cout << "newsdesk server listening on " << config.bind_address << ":" << config.port
-               << "\n";
+              << "\n";
     server.Run();
     return 0;
 }
