@@ -6,10 +6,6 @@ namespace newsdesk::protocol {
 
 namespace {
 
-int64_t ToMillis(TimePoint time) {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch()).count();
-}
-
 TimePoint FromMillis(int64_t millis) {
     return TimePoint{} + std::chrono::milliseconds(millis);
 }
