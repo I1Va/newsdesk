@@ -99,7 +99,8 @@ TEST_CASE("EncodeRecord/DecodeRecord round-trips a publish record with full subm
     PublishRecord publish;
     publish.story = StoryKey{"local", "fire"};
     publish.published_at = TimePoint{} + 1000h;
-    publish.submitters = {Submitter{"alice", TimePoint{} + 999h}, Submitter{"bob", TimePoint{} + 1000h}};
+    publish.submitters = {Submitter{"alice", TimePoint{} + 999h},
+                          Submitter{"bob", TimePoint{} + 1000h}};
     record.publish = publish;
 
     DecodeResult decoded = DecodeRecord(EncodeRecord(record));
@@ -166,7 +167,8 @@ TEST_CASE("DecodeRecord reports a cut-off line as truncated, not corrupt") {
 }
 
 TEST_CASE("DecodeRecord rejects valid JSON missing a required envelope field") {
-    DecodeResult decoded = DecodeRecord(R"({"seq":1,"type":"ack","body":{"client_id":"bob","seq":1}})");
+    DecodeResult decoded =
+        DecodeRecord(R"({"seq":1,"type":"ack","body":{"client_id":"bob","seq":1}})");
     CHECK(decoded.status == DecodeStatus::kCorrupt);
 }
 

@@ -56,7 +56,9 @@ TEST_CASE("ParseIncoming parses a bye message") {
     CHECK(parsed->type == IncomingType::kBye);
 }
 
-TEST_CASE("ParseIncoming rejects malformed JSON") { CHECK_FALSE(ParseIncoming("not json").has_value()); }
+TEST_CASE("ParseIncoming rejects malformed JSON") {
+    CHECK_FALSE(ParseIncoming("not json").has_value());
+}
 
 TEST_CASE("ParseIncoming rejects a message without a type field") {
     CHECK_FALSE(ParseIncoming(R"({"client_id":"alice"})").has_value());
@@ -153,6 +155,54 @@ TEST_CASE("Serialize produces the expected fields for a congrats payload") {
     CHECK(json.find("\"rank\":2") != std::string::npos);
     CHECK(json.find("\"rubric\":\"local\"") != std::string::npos);
     CHECK(json.find("\"topic\":\"fire\"") != std::string::npos);
+}
+
+TEST_CASE("ParseServerMessage round-trips a congrats payload including seq") {
+    CongratsPayload payload{9, StoryKey{"local", "fire"}, 1, "text"};
+    auto parsed = ParseServerMessage(Serialize(payload));
+    REQUIRE(parsed.has_value());
+    CHECK(parsed->type == OutgoingType::kCongrats);
+    REQUIRE(parsed->congrats.has_value());
+    CHECK(parsed->congrats->seq == 9);
+    CHECK(parsed->congrats->rank == 1);
+    CHECK(parsed->congrats->story.rubric == "local");
+}
+
+TEST_CASE("ParseServerMessage round-trips a receipt, including the reason when rejected") {
+    auto parsed =
+        ParseServerMessage(Serialize(Receipt{"n1", ReceiptStatus::kRejected, "empty_story"}));
+    REQUIRE(parsed.has_value());
+    CHECK(parsed->type == OutgoingType::kReceipt);
+    REQUIRE(parsed->receipt.has_value());
+    CHECK(parsed->receipt->status == ReceiptStatus::kRejected);
+    CHECK(parsed->receipt->reason == "empty_story");
+}
+
+TEST_CASE("ParseServerMessage round-trips a welcome message") {
+    auto parsed = ParseServerMessage(Serialize(WelcomeMessage{"alice", Role::kEditor}));
+    REQUIRE(parsed.has_value());
+    CHECK(parsed->type == OutgoingType::kWelcome);
+    REQUIRE(parsed->welcome.has_value());
+    CHECK(parsed->welcome->client_id == "alice");
+    CHECK(parsed->welcome->role == Role::kEditor);
+}
+
+TEST_CASE("ParseServerMessage round-trips a stats response with multiple clients") {
+    StatsResponseMessage response;
+    response.stats.push_back(ClientStats{"alice", 2, 1, 0.5, 2, 1, 1.0});
+    response.stats.push_back(ClientStats{"bob", 1, 0, 0.0, 1, 0, 0.0});
+
+    auto parsed = ParseServerMessage(Serialize(response));
+    REQUIRE(parsed.has_value());
+    CHECK(parsed->type == OutgoingType::kStatsResponse);
+    REQUIRE(parsed->stats_response.has_value());
+    REQUIRE(parsed->stats_response->stats.size() == 2);
+    CHECK(parsed->stats_response->stats[0].client_id == "alice");
+    CHECK(parsed->stats_response->stats[1].client_id == "bob");
+}
+
+TEST_CASE("ParseServerMessage rejects malformed JSON") {
+    CHECK_FALSE(ParseServerMessage("not json").has_value());
 }
 
 TEST_CASE("Serialize produces an array with every client for a stats response") {
