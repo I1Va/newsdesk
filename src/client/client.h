@@ -22,6 +22,7 @@ public:
     void Run();
 
 private:
+    bool WaitForConnect();
     void SendLine(const std::string& line);
     void PumpIncoming();
     void HandleStdinCommand(const std::string& command);

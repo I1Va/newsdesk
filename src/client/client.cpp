@@ -105,13 +105,36 @@ void Client::HandleStdinCommand(const std::string& command) {
     }
 }
 
+bool Client::WaitForConnect() {
+    platform_.SetPollInterest(socket_, platform::PollInterest::kReadWrite);
+    for (int attempt = 0; attempt < 50; ++attempt) {
+        std::vector<platform::PollEvent> events = platform_.Poll(200);
+        for (const platform::PollEvent& event : events) {
+            if (event.socket != socket_) {
+                continue;
+            }
+            if (event.error) {
+                return false;
+            }
+            if (event.writable || event.readable) {
+                return platform_.ConnectSucceeded(socket_);
+            }
+        }
+    }
+    return false;
+}
+
 void Client::Run() {
     socket_ = platform_.Connect(config_.server_address, config_.server_port);
     if (socket_ == platform::kInvalidSocket) {
         std::cerr << "failed to connect\n";
         return;
     }
-    platform_.SetPollInterest(socket_, platform::PollInterest::kReadWrite);
+    if (!WaitForConnect()) {
+        std::cerr << "failed to connect\n";
+        platform_.CloseSocket(socket_);
+        return;
+    }
     platform_.SetPollInterest(kStdin, platform::PollInterest::kRead);
 
     SendLine(protocol::Serialize(protocol::HelloMessage{config_.client_id, last_seq_}));

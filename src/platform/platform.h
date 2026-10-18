@@ -50,6 +50,8 @@ public:
     // Возвращает kInvalidSocket, если нет ожидающего подключения
     virtual SocketHandle Accept(SocketHandle listener) = 0;
 
+    virtual bool ConnectSucceeded(SocketHandle socket) = 0;
+
     virtual IoResult Read(SocketHandle socket, char* buffer, size_t size) = 0;
     virtual IoResult Write(SocketHandle socket, const char* data, size_t size) = 0;
     virtual void CloseSocket(SocketHandle socket) = 0;

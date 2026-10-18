@@ -97,6 +97,15 @@ public:
         return fd;
     }
 
+    bool ConnectSucceeded(SocketHandle socket) override {
+        int error = 0;
+        socklen_t len = sizeof(error);
+        if (getsockopt(static_cast<int>(socket), SOL_SOCKET, SO_ERROR, &error, &len) < 0) {
+            return false;
+        }
+        return error == 0;
+    }
+
     IoResult Read(SocketHandle socket, char* buffer, size_t size) override {
         ssize_t n = recv(static_cast<int>(socket), buffer, size, 0);
         if (n > 0) {
