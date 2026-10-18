@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -67,5 +68,7 @@ public:
     // = 1, только когда получен SIGINT/SIGTERM. Main loop должен будет остановиться.
     virtual bool ShutdownRequested() = 0;
 };
+
+std::unique_ptr<Platform> CreatePlatform();
 
 }  // namespace newsdesk::platform
