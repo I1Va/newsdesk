@@ -1,0 +1,13 @@
+{
+    "threshold": 0.75,
+    "congratulated_k": 3,
+    "half_life_hours": 6,
+    "listen": "0.0.0.0:7000",
+    "journal_path": "newsdesk.wal",
+    "clients": [
+        {"id": "alice", "trust": 0.5, "role": "reporter"},
+        {"id": "bob", "trust": 0.3, "role": "reporter"},
+        {"id": "carol", "trust": 0.4, "role": "reporter"},
+        {"id": "editor1", "trust": 0.0, "role": "editor"}
+    ]
+}
